@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat em Tempo Real</title>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <!-- Lista para exibir as mensagens. -->
+    <form id="form" action="">
+      <!-- Formulário para enviar mensagens. -->
+      <input id="input" autocomplete="off" /><button>Enviar</button>
+      <!-- Campo de entrada e botão para enviar mensagens. -->
+    </form>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"></script>
+    <script>
+      // Cria uma conexão Socket.IO com o servidor.
+      var socket = io.connect(
+        "http://" + document.domain + ":" + location.port
+      );
+
+      // Define um manipulador de evento para quando a conexão com o servidor é estabelecida.
+      socket.on("connect", function () {
+        console.log("Connected to server"); // Imprime uma mensagem indicando que a conexão foi estabelecida.
+      });
+
+      // Define um manipulador de evento para quando uma mensagem é recebida do servidor.
+      socket.on("message", function (msg) {
+        var ul = document.getElementById("messages"); // Obtém a lista de mensagens.
+        var li = document.createElement("li"); // Cria um novo elemento de lista.
+        li.appendChild(document.createTextNode(msg)); // Adiciona o texto da mensagem ao elemento de lista.
+        ul.appendChild(li); // Adiciona o elemento de lista à lista de mensagens.
+      });
+
+      // Define uma função para enviar mensagens quando o formulário é enviado.
+      document.getElementById("form").onsubmit = function () {
+        var input = document.getElementById("input"); // Obtém o campo de entrada de texto.
+
+        // Verifica se o campo de entrada não está vazio.
+        if (input.value.trim() !== "") {
+          // Envia a mensagem para o servidor.
+          socket.emit("message", input.value);
+          input.value = ""; // Limpa o campo de entrada.
+        }
+
+        return false; // Impede o envio do formulário.
+      };
+    </script>
+  </body>
+</html>
